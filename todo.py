@@ -34,13 +34,13 @@ def new_item():
         c.close()
 
 # returns message and updates the current list to show new information
-        return '<p>The new task was inserted into the database item, the ID is %s</p> <a href="/">View List</a>' % new_id
+        return '<p>Your new task has been added! Its ID is %s! You better be productive!</p> <a href="/">Return to List?</a>' % new_id
              
     else:
         return template('new_task.tpl')
 
 # updates the ID number and the text  
-@route('/edit/<no>', method='GET')
+@route('/edit/<no:int>', method='GET')
 # for changing already existing items
 def edit_item(no):
 
@@ -48,7 +48,7 @@ def edit_item(no):
         edit = request.GET.task.strip()
         status = request.GET.status.strip()
 
-        if status == 'open':
+        if status == 'Edit task?':
             status = 1
         else:
             status = 0
@@ -57,9 +57,7 @@ def edit_item(no):
         c = conn.cursor()
         c.execute("UPDATE todo SET task = ?, status = ? WHERE id LIKE ?", (edit, status, no))
         conn.commit()
-
-
-        return '<p>The item number %s was successfully updated</p> <a href="/">View List</a>' % no
+        return '<p>Item number %s was successfully changed.</p> <a href="/">Return to List?</a>' % no
     else:
         conn = sqlite3.connect('todo.db')
         c = conn.cursor()
@@ -67,8 +65,6 @@ def edit_item(no):
         cur_data = c.fetchone()
 
         return template('edit_task', old=cur_data, no=no)
-
-# NOTES! the edit thing IS working, it's just not getting to the right link. for example, if you type in http://localhost:8080/edit/2 it will work
 
 debug(True)
 run(reloader=True)
