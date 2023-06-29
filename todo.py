@@ -2,7 +2,7 @@
 
 # required imports
 import sqlite3
-from bottle import route, run, debug, template, request
+from bottle import route, run, debug, template, request, redirect
 # separating these for organization
 @route("/")
 @route("/todo")
@@ -29,15 +29,12 @@ def new_item():
 
         c.execute("INSERT INTO todo (task,status) VALUES (?,?)", (new,1))
         new_id = c.lastrowid
-
+    
         conn.commit()
         c.close()
+        #returns person to menu
+        redirect('/todo')
 
-# returns message and updates the current list to show new information
-        return '<p>Your new task has been added! Its ID is %s! You better be productive!</p> <a href="/">Return to List?</a>' % new_id
-             
-    else:
-        return template('new_task.tpl')
 
 # updates the ID number and the text  
 @route('/edit/<no:int>', method='GET')
@@ -57,7 +54,7 @@ def edit_item(no):
         c = conn.cursor()
         c.execute("UPDATE todo SET task = ?, status = ? WHERE id LIKE ?", (edit, status, no))
         conn.commit()
-        return '<p>Item number %s was successfully changed.</p> <a href="/">Return to List?</a>' % no
+        redirect('/todo')
     else:
         conn = sqlite3.connect('todo.db')
         c = conn.cursor()
